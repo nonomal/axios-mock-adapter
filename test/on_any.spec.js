@@ -1,11 +1,11 @@
-var axios = require("axios");
-var expect = require("chai").expect;
+const axios = require("axios");
+const expect = require("chai").expect;
 
-var MockAdapter = require("../src");
+const MockAdapter = require("../src");
 
 describe("MockAdapter onAny", function () {
-  var instance;
-  var mock;
+  let instance;
+  let mock;
 
   beforeEach(function () {
     instance = axios.create();
@@ -41,11 +41,11 @@ describe("MockAdapter onAny", function () {
   });
 
   it("mocks any request with a matching url and body", function () {
-    var body = [
+    const body = [
       { object: { with: { deep: "property" } }, array: ["1", "abc"] },
       "a",
     ];
-    mock.onAny("/anyWithBody", body).reply(200);
+    mock.onAny("/anyWithBody", { data: body }).reply(200);
 
     return instance
       .put("/anyWithBody", body)
@@ -54,6 +54,14 @@ describe("MockAdapter onAny", function () {
       })
       .then(function (response) {
         expect(response.status).to.equal(200);
+
+        return instance.post("/anyWithBody")
+          .then(function () {
+            throw new Error("should not get here");
+          })
+          .catch(function (err) {
+            expect(err.response.status).to.equal(404);
+          });
       });
   });
 

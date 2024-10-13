@@ -38,6 +38,21 @@ namespace SupportsResetHistory {
   mock.resetHistory();
 }
 
+namespace SupportsHistoryArray {
+  mock.history.length;
+  mock.history[0].method;
+  mock.history[0].url;
+  mock.history[0].params;
+  mock.history[0].data;
+  mock.history[0].headers;
+
+  mock.history.get[0].method;
+  mock.history.get[0].url;
+  mock.history.get[0].params;
+  mock.history.get[0].data;
+  mock.history.get[0].headers;
+}
+
 namespace SupportsRestore {
   mock.restore();
 }
@@ -75,18 +90,14 @@ namespace AllowsStringBodyMatcher {
 }
 
 namespace AllowsBodyMatcher {
-  mock.onGet('/foo', {
-    id: 4,
-    name: 'foo'
-  });
+  mock.onPost('/foo', {id: 4, name: 'foo'});
+  mock.onPut('/foo', {id: 4, name: 'foo'});
+  mock.onAny('/foo', {data: {id: 4, name: 'foo'}});
 }
 
-namespace AllowsParameterMatcher {
-  mock.onGet('/foo', {
-    params: {
-      searchText: 'John'
-    }
-  });
+namespace AllowsParamsMatcher {
+  mock.onGet('/foo', {params: {searchText: 'John'}});
+  mock.onDelete('/foo', {params: {searchText: 'John'}});
 }
 
 namespace AllowsReplyWithStatus {
@@ -123,6 +134,10 @@ namespace SupportsNetworkError {
 
 namespace SupportsNetworkErrorOnce {
   mock.onGet().networkErrorOnce();
+}
+
+namespace withDelayInMs {
+  mock.onGet().withDelayInMs(2000).reply(200, { data: 'foo' });
 }
 
 namespace AllowsFunctionReply {

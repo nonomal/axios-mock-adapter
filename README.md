@@ -20,11 +20,11 @@ axios-mock-adapter works on Node as well as in a browser, it works with axios v0
 Mocking a `GET` request
 
 ```js
-var axios = require("axios");
-var MockAdapter = require("axios-mock-adapter");
+const axios = require("axios");
+const AxiosMockAdapter = require("axios-mock-adapter");
 
 // This sets the mock adapter on the default instance
-var mock = new MockAdapter(axios);
+const mock = new AxiosMockAdapter(axios);
 
 // Mock any GET request to /users
 // arguments for reply are (status, data, headers)
@@ -40,11 +40,11 @@ axios.get("/users").then(function (response) {
 Mocking a `GET` request with specific parameters
 
 ```js
-var axios = require("axios");
-var MockAdapter = require("axios-mock-adapter");
+const axios = require("axios");
+const AxiosMockAdapter = require("axios-mock-adapter");
 
 // This sets the mock adapter on the default instance
-var mock = new MockAdapter(axios);
+const mock = new AxiosMockAdapter(axios);
 
 // Mock GET request to /users when param `searchText` is 'John'
 // arguments for reply are (status, data, headers)
@@ -65,7 +65,7 @@ To add a delay to responses, specify a delay amount (in milliseconds) when insta
 
 ```js
 // All requests using this instance will have a 2 seconds delay:
-var mock = new MockAdapter(axiosInstance, { delayResponse: 2000 });
+const mock = new AxiosMockAdapter(axiosInstance, { delayResponse: 2000 });
 ```
 
 You can restore the original adapter (which will remove the mocking behavior)
@@ -226,9 +226,11 @@ mock
   .onPost(
     "/product",
     { id: 1 },
-    expect.objectContaining({
-      Authorization: expect.stringMatching(/^Basic /),
-    })
+    {
+      headers: expect.objectContaining({
+        Authorization: expect.stringMatching(/^Basic /),
+      })
+    }
   )
   .reply(204);
 ```
@@ -277,7 +279,7 @@ If you set `onNoMatch` option to `passthrough` all requests would be forwarded o
 ```js
 // Mock all requests to /foo with HTTP 200, but forward
 // any others requests to server
-var mock = new MockAdapter(axiosInstance, { onNoMatch: "passthrough" });
+const mock = new AxiosMockAdapter(axiosInstance, { onNoMatch: "passthrough" });
 
 mock.onAny("/foo").reply(200);
 ```
@@ -285,7 +287,7 @@ mock.onAny("/foo").reply(200);
 Using `onNoMatch` option with `throwException` to throw an exception when a request is made without match any handler. It's helpful to debug your test mocks.
 
 ```js
-var mock = new MockAdapter(axiosInstance, { onNoMatch: "throwException" });
+const mock = new AxiosMockAdapter(axiosInstance, { onNoMatch: "throwException" });
 
 mock.onAny("/foo").reply(200);
 
@@ -321,9 +323,9 @@ mock.onGet("/product").reply(function (config) {
 Composing from multiple sources with Promises:
 
 ```js
-var normalAxios = axios.create();
-var mockAxios = axios.create();
-var mock = new MockAdapter(mockAxios);
+const normalAxios = axios.create();
+const mockAxios = axios.create();
+const mock = new AxiosMockAdapter(mockAxios);
 
 mock
   .onGet("/orders")
@@ -349,7 +351,7 @@ This is useful for testing.
 ```js
 describe("Feature", () => {
   it("requests an endpoint", (done) => {
-    var mock = new AxiosMockAdapter(axios);
+    const mock = new AxiosMockAdapter(axios);
     mock.onPost("/endpoint").replyOnce(200);
 
     feature

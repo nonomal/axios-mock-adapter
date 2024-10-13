@@ -1,15 +1,14 @@
-var axios = require("axios");
-var isLegacyAxios = require("axios/package.json").version[0] === "0";
-var expect = require("chai").expect;
-var createServer = require("http").createServer;
+const axios = require("axios");
+const expect = require("chai").expect;
+const createServer = require("http").createServer;
 
-var MockAdapter = require("../src");
+const MockAdapter = require("../src");
 
 describe("onNoMatch=passthrough option tests (requires Node)", function () {
-  var instance;
-  var mock;
-  var httpServer;
-  var serverUrl;
+  let instance;
+  let mock;
+  let httpServer;
+  let serverUrl;
 
   before("set up Node server", function () {
     return new Promise(function (resolve, reject) {
@@ -24,7 +23,7 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
         }
       })
         .listen(0, "127.0.0.1", function () {
-          serverUrl = "http://127.0.0.1:" + httpServer.address().port;
+          serverUrl = `http://127.0.0.1:${httpServer.address().port}`;
           resolve();
         })
         .on("error", reject);
@@ -41,12 +40,12 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
   });
 
   it("works correctly if set no handlers", function () {
-    var randomPath = "xyz" + Math.round(10000 * Math.random());
+    const randomPath = `xyz${Math.round(10000 * Math.random())}`;
 
     return Promise.all([
-      instance.get("/" + randomPath).then(function (response) {
+      instance.get(`/${randomPath}`).then(function (response) {
         expect(response.status).to.equal(200);
-        expect(response.data).to.equal("/" + randomPath);
+        expect(response.data).to.equal(`/${randomPath}`);
       }),
     ]);
   });
@@ -56,7 +55,7 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
     mock.onGet("/error").reply(200, "success");
     mock.onGet("/bar").passThrough();
 
-    var randomPath = "xyz" + Math.round(10000 * Math.random());
+    const randomPath = `xyz${Math.round(10000 * Math.random())}`;
 
     return Promise.all([
       instance.get("/foo").then(function (response) {
@@ -71,9 +70,9 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
         expect(response.status).to.equal(200);
         expect(response.data).to.equal("/bar");
       }),
-      instance.get("/" + randomPath).then(function (response) {
+      instance.get(`/${randomPath}`).then(function (response) {
         expect(response.status).to.equal(200);
-        expect(response.data).to.equal("/" + randomPath);
+        expect(response.data).to.equal(`/${randomPath}`);
       }),
     ]);
   });
@@ -93,16 +92,16 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
   it("setting passThrough handler don't break anything", function () {
     mock.onGet("/foo").reply(200, "bar").onAny().passThrough();
 
-    var randomPath = "xyz" + Math.round(10000 * Math.random());
+    const randomPath = `xyz${Math.round(10000 * Math.random())}`;
 
     return Promise.all([
       instance.get("/foo").then(function (response) {
         expect(response.status).to.equal(200);
         expect(response.data).to.equal("bar");
       }),
-      instance.get("/" + randomPath).then(function (response) {
+      instance.get(`/${randomPath}`).then(function (response) {
         expect(response.status).to.equal(200);
-        expect(response.data).to.equal("/" + randomPath);
+        expect(response.data).to.equal(`/${randomPath}`);
       }),
       instance.post("/post").then(function (response) {
         expect(response.status).to.equal(200);
@@ -113,7 +112,7 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
 
   it("handles baseURL correctly", function () {
     instance = axios.create({
-      baseURL: "/test",
+      baseURL: "http://localhost/test",
       proxy: {
         host: "127.0.0.1",
         port: httpServer.address().port,
@@ -123,11 +122,7 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
 
     return instance.get("/foo").then(function (response) {
       expect(response.status).to.equal(200);
-      if (isLegacyAxios) {
-        expect(response.data).to.equal("http://null/test/foo");
-      } else {
-        expect(response.data).to.equal("http://localhost/test/foo");
-      }
+      expect(response.data).to.equal("http://localhost/test/foo");
     });
   });
 
@@ -137,7 +132,7 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
         data: "foo",
         transformRequest: [
           function (data) {
-            return data + "foo";
+            return `${data}foo`;
           },
         ],
       })
@@ -151,7 +146,7 @@ describe("onNoMatch=passthrough option tests (requires Node)", function () {
       .get("/foo", {
         transformResponse: [
           function (data) {
-            return data + "foo";
+            return `${data}foo`;
           },
         ],
       })
